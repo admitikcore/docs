@@ -43,6 +43,12 @@ theme = "docsy"
     githubbranch = "master"
 
 [[menus.main]]
+  name = ""
+  url = "https://github.com/admitikcore/admitik"
+  weight = 5
+  pre = '<i class="fa-brands fa-github" title="Admitik on GitHub" aria-hidden="true"></i><span class="visually-hidden">Admitik on GitHub</span>'
+
+[[menus.main]]
   name = "Documentation"
   url = "/docs/"
   weight = 10
