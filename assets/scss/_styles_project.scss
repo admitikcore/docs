@@ -769,3 +769,25 @@ a.cap-card:hover {
   color: rgba($admitik-ink, 0.45);
   margin-bottom: 0.4rem;
 }
+
+// -- GitHub link in the navbar -------------------------------------------
+
+$nav-github: ".td-navbar .nav-link[href^='https://github.com/admitikcore/admitik']";
+
+#{$nav-github} {
+  display: inline-flex;
+  align-items: center;
+  padding-inline: 0.55rem;
+  border-radius: 999px;
+}
+
+#{$nav-github} i {
+  font-size: 1.35rem;
+  line-height: 1;
+  transform: translateY(2px);
+}
+
+#{$nav-github}:hover,
+#{$nav-github}:focus-visible {
+  background-color: rgba(255, 255, 255, 0.14);
+}
