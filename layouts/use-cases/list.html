@@ -1,0 +1,337 @@
+{{ define "main" -}}
+{{ $pages := .Pages -}}
+{{/* Dimensions are ordered by this list and anything else falls after it, so
+     a new dimension needs no template change to show up. */}}
+{{ $preferred := slice "topic" "resource" "engine" "feature" "level" -}}
+
+{{/* Every label is the same shape: dimension:value. The dimensions only decide
+     which block it lands in, so adding one is a matter of using it. */}}
+{{ $all := slice -}}
+{{ $found := slice -}}
+{{ range $pages -}}
+  {{ range .Params.labels -}}
+    {{ $all = $all | append . -}}
+    {{ $parts := split . ":" -}}
+    {{ if lt (len $parts) 2 -}}
+      {{ warnf "%s: label %q has no dimension, it should look like topic:something" $.Page.File.Path . -}}
+    {{ else -}}
+      {{ if not (in $found (index $parts 0)) }}{{ $found = $found | append (index $parts 0) }}{{ end -}}
+    {{ end -}}
+  {{ end -}}
+{{ end -}}
+{{ $dims := slice -}}
+{{ range $preferred }}{{ if in $found . }}{{ $dims = $dims | append . }}{{ end }}{{ end -}}
+{{ range sort $found }}{{ if not (in $preferred .) }}{{ $dims = $dims | append . }}{{ end }}{{ end -}}
+
+<div class="container uc-page">
+  <div class="td-content">
+    <h1>{{ .Title }}</h1>
+    {{ with .Params.description }}<p class="lead">{{ . | markdownify }}</p>{{ end }}
+    {{ .Content }}
+  </div>
+
+  <div class="uc-layout">
+    <aside class="uc-panel" id="uc-panel" aria-label="Filters">
+      <div class="uc-panel__head">
+        <span class="uc-panel__title">Filters</span>
+        <button class="uc-clear" id="uc-clear" type="button" hidden>Clear all</button>
+      </div>
+
+      <div class="uc-panel__group" data-dim="policy">
+        <span class="uc-panel__legend">Type</span>
+        <div class="uc-panel__values">
+          <button class="uc-value" data-label="policy:all" data-dim="policy" type="button" aria-pressed="true">All</button>
+          <button class="uc-value" data-label="policy:validation" data-dim="policy" type="button" aria-pressed="false">Validation</button>
+          <button class="uc-value" data-label="policy:mutation" data-dim="policy" type="button" aria-pressed="false">Mutation</button>
+          <button class="uc-value" data-label="policy:generation" data-dim="policy" type="button" aria-pressed="false">Generation</button>
+          <button class="uc-value" data-label="policy:solution" data-dim="policy" type="button" aria-pressed="false">Solution</button>
+        </div>
+      </div>
+
+      {{ range $dim := $dims -}}
+        {{ $values := slice -}}
+        {{ range $all -}}
+          {{ if hasPrefix . (printf "%s:" $dim) }}{{ if not (in $values .) }}{{ $values = $values | append . }}{{ end }}{{ end -}}
+        {{ end -}}
+        {{ if $values -}}
+          <details class="uc-panel__group" data-dim="{{ $dim }}" open>
+            <summary class="uc-panel__legend">{{ $dim }}<span class="uc-panel__count">{{ len $values }}</span></summary>
+            <div class="uc-panel__values">
+              {{ range $i, $label := sort $values -}}
+                {{ $count := 0 -}}
+                {{ range $pages }}{{ if in .Params.labels $label }}{{ $count = add $count 1 }}{{ end }}{{ end -}}
+                <button class="uc-value" data-label="{{ $label }}" data-dim="{{ $dim }}" type="button" aria-pressed="false"{{ if gt $i 7 }} data-overflow{{ end }}>
+                  {{ replace $label (printf "%s:" $dim) "" }}<span class="uc-value__count" data-count="{{ $count }}">{{ $count }}</span>
+                </button>
+              {{ end -}}
+              {{ if gt (len $values) 8 }}
+                <button class="uc-more" type="button">+{{ sub (len $values) 8 }} more</button>
+              {{ end -}}
+            </div>
+          </details>
+        {{ end -}}
+      {{ end -}}
+    </aside>
+
+    <div class="uc-results">
+      <div class="uc-toolbar">
+        <input class="uc-search" id="uc-search" type="search" placeholder="Search use cases" aria-label="Search use cases" autocomplete="off">
+        <button class="uc-toggle" id="uc-toggle" type="button" aria-expanded="false" aria-controls="uc-panel">Filters</button>
+      </div>
+
+      <div class="uc-summary">
+        <span id="uc-count">{{ len $pages }} use cases</span>
+        <div class="uc-active" id="uc-active"></div>
+      </div>
+
+      <div class="uc-grid" id="uc-grid" data-index="{{ "use-cases/index.json" | relURL }}">
+        {{ range $pages -}}
+          {{ partial "use-case-card.html" . }}
+        {{- end }}
+      </div>
+
+      <p class="uc-empty" id="uc-empty" hidden>
+        Nothing matches those filters.
+        <button class="uc-clear" data-clear type="button">Clear them</button>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var grid = document.getElementById('uc-grid');
+    var cards = Array.prototype.slice.call(grid.querySelectorAll('.uc-card')).map(function (card) {
+      var link = card.querySelector('h3 a');
+      return {
+        el: card,
+        url: link ? link.getAttribute('href') : '',
+        policy: card.dataset.policy,
+        labels: (card.dataset.labels || '').split(' ').filter(Boolean)
+      };
+    });
+
+    var values = Array.prototype.slice.call(document.querySelectorAll('.uc-value'));
+    var count = document.getElementById('uc-count');
+    var empty = document.getElementById('uc-empty');
+    var clearButtons = Array.prototype.slice.call(document.querySelectorAll('.uc-clear'));
+    var search = document.getElementById('uc-search');
+    var toggle = document.getElementById('uc-toggle');
+    var panel = document.getElementById('uc-panel');
+
+    var selected = new Map();
+    var query = '';
+    var index = null;
+
+    // Full text lives in a small index built at render time, so the cards stay
+    // cheap and a search for something only said in the body still finds it.
+    var indexURL = grid.dataset.index;
+
+    function loadIndex(done) {
+      if (index) { done(); return; }
+      fetch(indexURL)
+        .then(function (r) { return r.ok ? r.json() : []; })
+        .then(function (data) {
+          index = new Map();
+          data.forEach(function (entry) {
+            index.set(entry.url, [entry.title, entry.description, entry.labels, entry.text].join(' ').toLowerCase());
+          });
+        })
+        .catch(function () { index = new Map(); })
+        .then(done);
+    }
+
+    function textMatches(card, terms) {
+      var haystack;
+      if (index && index.has(card.url)) {
+        haystack = index.get(card.url);
+      } else {
+        var title = card.el.querySelector('h3');
+        var desc = card.el.querySelector('p');
+        haystack = ((title ? title.textContent : '') + ' ' + (desc ? desc.textContent : '')).toLowerCase();
+      }
+      return terms.every(function (term) { return haystack.indexOf(term) !== -1; });
+    }
+
+    function groupOf(label) { return label.split(':')[0]; }
+
+    // A card matches when it satisfies every dimension that has something
+    // selected. Inside one dimension any of the values is enough.
+    function matches(card, overrides) {
+      var wanted = new Map(selected);
+      if (overrides) wanted = overrides;
+      for (var entry of wanted) {
+        var group = entry[0], names = entry[1];
+        if (group === 'policy') {
+          if (names.indexOf('policy:all') !== -1) continue;
+          if (names.map(function (n) { return n.split(':')[1]; }).indexOf(card.policy) === -1) return false;
+          continue;
+        }
+        var hit = names.some(function (name) { return card.labels.indexOf(name) !== -1; });
+        if (!hit) return false;
+      }
+      return true;
+    }
+
+    // Counts are computed with the rest of the selection applied, so a value
+    // showing 0 is one that leads nowhere from where you are.
+    function countsFor(cardList) {
+      var result = new Map();
+      values.forEach(function (button) {
+        var label = button.dataset.label;
+        var group = button.dataset.dim;
+        // The count of a value ignores what is selected in its own dimension,
+        // otherwise choosing two of them would report the size of the union.
+        var probe = new Map(selected);
+        probe.delete(group);
+        probe.set(group, [label]);
+        var n = cardList.filter(function (card) { return matches(card, probe); }).length;
+        result.set(label, n);
+      });
+      return result;
+    }
+
+    function render() {
+      var counts = countsFor(cards);
+      var shown = 0;
+
+      var terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+
+      cards.forEach(function (card) {
+        card.el.hidden = !matches(card, null) || (terms.length > 0 && !textMatches(card, terms));
+        if (!card.el.hidden) shown++;
+      });
+
+      values.forEach(function (button) {
+        var label = button.dataset.label;
+        var isSelected = (selected.get(button.dataset.dim) || []).indexOf(label) !== -1;
+        var n = counts.get(label);
+        button.classList.toggle('is-active', isSelected);
+        button.setAttribute('aria-pressed', isSelected);
+        button.classList.toggle('is-empty', !isSelected && n === 0);
+        button.disabled = !isSelected && n === 0;
+        var badge = button.querySelector('.uc-value__count');
+        if (badge) badge.textContent = n;
+      });
+
+      count.textContent = shown === cards.length
+        ? shown + ' use cases'
+        : shown + ' of ' + cards.length + ' use cases';
+      empty.hidden = shown > 0;
+
+      var active = selected.size > 0 || query !== '';
+      clearButtons.forEach(function (b) { b.hidden = !active; });
+      renderActive();
+
+      var params = new URLSearchParams();
+      var flat = [];
+      selected.forEach(function (names) { flat = flat.concat(names); });
+      var policy = (selected.get('policy') || []).filter(function (l) { return l !== 'policy:all'; });
+      if (policy.length) params.set('policy', policy[0].split(':')[1]);
+      var rest = flat.filter(function (l) { return groupOf(l) !== 'policy'; });
+      if (rest.length) params.set('labels', rest.join(','));
+      if (query) params.set('q', query);
+      var queryString = params.toString();
+      history.replaceState(null, '', queryString ? '?' + queryString : location.pathname);
+    }
+
+    // What is applied, outside the panel: on a phone the panel is closed.
+    function renderActive() {
+      var host = document.getElementById('uc-active');
+      if (!host) return;
+      host.innerHTML = '';
+      selected.forEach(function (names, dim) {
+        names.forEach(function (label) {
+          if (label === 'policy:all') return;
+          var chip = document.createElement('button');
+          chip.type = 'button';
+          chip.className = 'uc-active__chip';
+          chip.textContent = dim === 'policy' ? label.split(':')[1] : label;
+          chip.addEventListener('click', function () {
+            if (dim === 'policy') { selected.delete('policy'); render(); return; }
+            toggle(label, dim);
+          });
+          host.appendChild(chip);
+        });
+      });
+    }
+
+    function toggle(label, dim) {
+      var names = selected.get(dim) || [];
+      var at = names.indexOf(label);
+      if (at === -1) names.push(label); else names.splice(at, 1);
+      if (names.length) selected.set(dim, names); else selected.delete(dim);
+      render();
+    }
+
+    function clearAll() {
+      selected.clear();
+      query = '';
+      if (search) search.value = '';
+      render();
+    }
+
+    function restore() {
+      var params = new URLSearchParams(location.search);
+      var policy = params.get('policy');
+      if (policy) selected.set('policy', ['policy:' + policy]);
+      var q = params.get('q');
+      if (q) { query = q; if (search) search.value = q; }
+      var labels = params.get('labels');
+      if (labels) {
+        labels.split(',').filter(Boolean).forEach(function (label) {
+          var group = groupOf(label);
+          selected.set(group, (selected.get(group) || []).concat([label]));
+        });
+      }
+    }
+
+    values.forEach(function (button) {
+      button.addEventListener('click', function () {
+        var dim = button.dataset.dim;
+        if (dim === 'policy') {
+          selected.delete('policy');
+          if (button.dataset.label !== 'policy:all') selected.set('policy', [button.dataset.label]);
+          render();
+          return;
+        }
+        toggle(button.dataset.label, dim);
+      });
+    });
+
+    clearButtons.forEach(function (button) {
+      button.addEventListener('click', clearAll);
+    });
+
+    document.querySelectorAll('.uc-more').forEach(function (button) {
+      button.addEventListener('click', function () {
+        var group = button.closest('.uc-panel__group');
+        group.classList.toggle('is-expanded');
+        button.textContent = group.classList.contains('is-expanded') ? 'Show less' : button.dataset.label;
+      });
+      button.dataset.label = button.textContent;
+    });
+
+    if (search) {
+      var timer = null;
+      search.addEventListener('input', function () {
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+          query = search.value.trim();
+          loadIndex(render);
+        }, 120);
+      });
+    }
+
+    if (toggle && panel) {
+      toggle.addEventListener('click', function () {
+        var open = panel.classList.toggle('is-open');
+        toggle.setAttribute('aria-expanded', open);
+      });
+    }
+
+    restore();
+    if (query) loadIndex(render); else render();
+  })();
+</script>
+{{ end -}}

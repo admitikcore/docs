@@ -1,0 +1,12 @@
+{{- $out := slice -}}
+{{- range .Pages -}}
+  {{- $out = $out | append (dict
+      "title" .Title
+      "url" .RelPermalink
+      "description" (.Params.description | default "")
+      "policy" .Params.policy
+      "labels" (delimit .Params.labels " ")
+      "text" (.Plain | htmlUnescape)
+  ) -}}
+{{- end -}}
+{{- $out | jsonify -}}

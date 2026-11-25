@@ -1,0 +1,25 @@
+{{ $p := . -}}
+{{ $dims := slice "topic" "resource" "engine" "feature" "level" -}}
+
+{{/* Every label is classified, and the page shows them all that way. */}}
+<div class="uc-labels">
+  <div class="uc-labels__row">
+    <span class="uc-labels__legend">type</span>
+    <a class="uc-chip uc-chip--link uc-chip--{{ $p.Params.policy }}" href="{{ "/use-cases/?policy=" | relURL }}{{ $p.Params.policy }}">{{ $p.Params.policy }}</a>
+  </div>
+
+  {{ range $dim := $dims -}}
+    {{ $values := slice -}}
+    {{ range $p.Params.labels -}}
+      {{ if hasPrefix . (printf "%s:" $dim) }}{{ $values = $values | append (replace . (printf "%s:" $dim) "") }}{{ end -}}
+    {{ end -}}
+    {{ if $values }}
+      <div class="uc-labels__row">
+        <span class="uc-labels__legend">{{ $dim }}</span>
+        {{ range $values -}}
+          <a class="uc-chip uc-chip--link" href="{{ "/use-cases/?labels=" | relURL }}{{ $dim }}:{{ . | urlquery }}">{{ . }}</a>
+        {{ end -}}
+      </div>
+    {{ end -}}
+  {{ end }}
+</div>

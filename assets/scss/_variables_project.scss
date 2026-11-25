@@ -1,0 +1,31 @@
+// Admitik brand. Loaded before Bootstrap, so these override its defaults.
+
+$admitik-navy: #032d87;
+$admitik-navy-dark: #021f5e;
+$admitik-ink: #071a45;
+$admitik-blue: #27458a;
+$admitik-sky: #b1c4e9;
+$admitik-mist: #eef2fb;
+
+$primary: $admitik-navy;
+$secondary: $admitik-sky;
+$dark: $admitik-ink;
+
+$link-color: $admitik-blue;
+$link-hover-color: $admitik-navy;
+$link-decoration: none;
+$link-hover-decoration: underline;
+
+$font-family-sans-serif: "Inter", "Helvetica Neue", Arial, sans-serif;
+$headings-font-family: "Poppins", "Inter", sans-serif;
+$headings-font-weight: 600;
+
+$td-navbar-bg-color: $admitik-navy;
+$td-navbar-min-height: 4.5rem;
+$td-sidebar-bg-color: $admitik-mist;
+$td-sidebar-border-color: darken($admitik-mist, 6%);
+$td-enable-google-fonts: false;
+
+$code-color: $admitik-navy;
+$code-font-size: 0.875em;
+$code-bg: $admitik-mist;

@@ -1,0 +1,41 @@
+name: Checks
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install the theme and the tooling
+        run: |
+          npm ci
+          npm ci --prefix themes/docsy
+
+      - name: Install Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: "0.170.1"
+          extended: true
+
+      - name: Put Dart Sass on the PATH
+        run: |
+          for d in node_modules/sass-embedded-*/dart-sass; do
+            if "$d/sass" --version >/dev/null 2>&1; then
+              echo "$PWD/$d" >> "$GITHUB_PATH"
+              break
+            fi
+          done
+
+      - name: Build and check the links
+        run: make check

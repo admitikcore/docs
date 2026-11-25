@@ -1,0 +1,58 @@
+baseURL = "https://admitik.dev/"
+title = "Admitik"
+locale = "en-US"
+enableRobotsTXT = true
+enableGitInfo = false
+disableKinds = ["taxonomy", "term"]
+defaultContentLanguage = "en"
+defaultContentLanguageInSubdir = false
+contentDir = "content/en"
+theme = "docsy"
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.parser]
+      autoHeadingID = true
+      attribute = { block = true, title = true }
+    [markup.goldmark.renderer]
+      unsafe = true
+  [markup.highlight]
+    style = "github-dark"
+
+[params]
+  description = "Admitik is a policy engine for Kubernetes. It validates, mutates and generates objects."
+  # Rendered as markdown inside the footer, with the year in front.
+  copyright = "The Admitik authors<br>Made with ❤️ from the Canary Islands by [its community](https://github.com/admitikcore)"
+  offlineSearch = true
+  github_repo = "https://github.com/admitikcore/docs"
+
+  # The version selector of the navbar reads this. Add one entry per published
+  # version, newest first, and the same page path is kept when switching.
+  version_menu = "v1.11"
+  version_menu_pagelinks = true
+
+  [params.ui]
+    navbar_theme = "dark"
+    sidebar_menu_compact = true
+    sidebar_search_disable = true
+
+
+  [[params.versions]]
+    version = "v1.11"
+    url = "https://admitik.dev/"
+    githubbranch = "master"
+
+[[menus.main]]
+  name = "Documentation"
+  url = "/docs/"
+  weight = 10
+
+[[menus.main]]
+  name = "Use cases"
+  url = "/use-cases/"
+  weight = 20
+
+[module]
+  [module.hugoVersion]
+    extended = true
+    min = "0.160.1"

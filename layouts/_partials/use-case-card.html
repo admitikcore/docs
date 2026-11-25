@@ -1,0 +1,8 @@
+{{ $p := .Page -}}
+<article class="uc-card" data-policy="{{ $p.Params.policy }}" data-labels="{{ delimit $p.Params.labels " " }}">
+  <div>
+    <span class="uc-chip uc-chip--{{ $p.Params.policy }}">{{ $p.Params.policy }}</span>
+  </div>
+  <h3><a href="{{ $p.RelPermalink }}">{{ $p.Title }}</a></h3>
+  <p>{{ $p.Params.description }}</p>
+</article>

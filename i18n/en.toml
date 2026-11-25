@@ -1,0 +1,4 @@
+# Docsy appends this after the copyright. The footer says what it needs to say
+# without it.
+[footer_all_rights_reserved]
+other = ""

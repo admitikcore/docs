@@ -1,0 +1,771 @@
+// Branding on top of Docsy. Everything here is additive: no theme file is copied.
+
+// -- Navbar ---------------------------------------------------------------
+
+.td-navbar {
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.td-navbar .navbar-brand {
+  color: #fff;
+  font-family: $headings-font-family;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  font-size: 1.35rem;
+}
+
+.td-navbar .navbar-brand__logo svg {
+  height: 2rem;
+  width: auto;
+}
+
+.td-navbar .nav-link {
+  font-weight: 500;
+}
+
+// -- Landing page ---------------------------------------------------------
+// The cover image is the project header: shield, wordmark and tagline.
+
+.td-cover-block {
+  background-color: $admitik-navy;
+}
+
+.td-cover-block {
+  padding-top: 5rem;
+  padding-bottom: 6rem;
+}
+
+.td-cover-block .display-1 {
+  font-family: $headings-font-family;
+  font-weight: 700;
+  font-size: clamp(2.75rem, 6vw, 4.5rem);
+  letter-spacing: -0.03em;
+  text-shadow: 0 2px 24px rgba(2, 31, 94, 0.45);
+}
+
+// The shield, at twice the size it is drawn: the cover shortcode resizes page
+// resources to 70px, which is not enough on a high density screen.
+.td-cover-block .display-1::before {
+  content: "";
+  display: inline-block;
+  width: 3.1rem;
+  height: 4rem;
+  margin-right: 0.4rem;
+  vertical-align: -0.35rem;
+  background: url("/images/logo-hero.png") no-repeat center / contain;
+}
+
+.td-cover-block .lead {
+  font-size: 1.35rem;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+// Second line of the hero: same message, one step down.
+.td-cover-block .hero-sub {
+  font-size: 1.1rem;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.78);
+  margin-top: -0.75rem;
+  margin-bottom: 0;
+}
+
+// -- Blocks ---------------------------------------------------------------
+
+.td-box--secondary {
+  background-color: $admitik-mist !important;
+}
+
+.td-arrow-down-link a {
+  color: #fff !important;
+}
+
+// -- Use case marketplace -------------------------------------------------
+
+.uc-layout {
+  display: grid;
+  grid-template-columns: 15rem minmax(0, 1fr);
+  gap: 2.5rem;
+  align-items: start;
+  margin-top: 2rem;
+}
+
+@media (max-width: 991px) {
+  .uc-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+}
+
+// The panel is what keeps a hundred labels readable: one block per dimension,
+// each one collapsible, with the count of what is still reachable.
+
+.uc-panel {
+  position: sticky;
+  top: 6rem;
+  max-height: calc(100vh - 8rem);
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  font-size: 0.9rem;
+
+  @media (max-width: 991px) {
+    position: static;
+    max-height: none;
+    display: none;
+    padding: 0.5rem 0 1.5rem;
+
+    &.is-open {
+      display: block;
+    }
+  }
+}
+
+.uc-panel__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.uc-panel__title {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: rgba($admitik-ink, 0.55);
+}
+
+.uc-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.uc-search {
+  flex: 1;
+  max-width: 24rem;
+  border: 1px solid rgba($admitik-navy, 0.18);
+  border-radius: 0.4rem;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.9rem;
+
+  &:focus {
+    outline: 2px solid rgba($admitik-navy, 0.25);
+    outline-offset: 1px;
+  }
+}
+
+.uc-panel__group {
+  border-top: 1px solid rgba($admitik-navy, 0.1);
+  padding: 0.6rem 0;
+}
+
+.uc-panel__legend {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  font-size: 0.8rem;
+  color: $admitik-ink;
+  cursor: pointer;
+  list-style: none;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  &::before {
+    content: "▸";
+    font-size: 0.7rem;
+    color: rgba($admitik-ink, 0.45);
+  }
+
+  details[open] > &::before {
+    content: "▾";
+  }
+}
+
+.uc-panel__count {
+  margin-left: auto;
+  font-weight: 400;
+  font-size: 0.75rem;
+  color: rgba($admitik-ink, 0.45);
+}
+
+.uc-panel__values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+}
+
+.uc-value {
+  border: 0;
+  background: rgba($admitik-navy, 0.06);
+  color: $admitik-blue;
+  border-radius: 0.35rem;
+  padding: 0.15rem 0.45rem;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: background-color 0.12s ease, color 0.12s ease;
+
+  &:hover {
+    background: rgba($admitik-navy, 0.14);
+  }
+
+  &.is-active {
+    background: $admitik-navy;
+    color: #fff;
+  }
+
+  &.is-empty,
+  &:disabled {
+    opacity: 0.35;
+    cursor: default;
+    text-decoration: line-through;
+  }
+}
+
+.uc-panel__group[data-dim]:not(.is-expanded) .uc-value[data-overflow] {
+  display: none;
+}
+
+.uc-more {
+  border: 0;
+  background: none;
+  padding: 0.15rem 0;
+  font-size: 0.8rem;
+  color: $admitik-blue;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.uc-panel__group.is-expanded .uc-more {
+  display: none;
+}
+
+.uc-active {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.uc-active__chip {
+  border: 0;
+  background: $admitik-navy;
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.1rem 0.6rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+
+  &::after {
+    content: " ×";
+    opacity: 0.7;
+  }
+
+  &:hover {
+    background: $admitik-ink;
+  }
+}
+
+.uc-value__count {
+  font-size: 0.7rem;
+  opacity: 0.6;
+}
+
+.uc-results {
+  min-width: 0;
+}
+
+.uc-summary {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  color: rgba($admitik-ink, 0.6);
+}
+
+.uc-toggle {
+  border: 1px solid rgba($admitik-navy, 0.2);
+  background: #fff;
+  border-radius: 0.4rem;
+  padding: 0.2rem 0.7rem;
+  font-size: 0.85rem;
+  color: $admitik-blue;
+  margin-left: auto;
+
+  @media (min-width: 992px) {
+    display: none;
+  }
+}
+
+.uc-clear {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: $admitik-blue;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.uc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  align-items: start;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.uc-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba($admitik-navy, 0.12);
+  border-radius: 0.75rem;
+  padding: 1.1rem 1.2rem;
+  background: #fff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+
+  &:hover {
+    border-color: rgba($admitik-navy, 0.35);
+    box-shadow: 0 8px 24px rgba($admitik-ink, 0.08);
+    transform: translateY(-1px);
+  }
+
+  h3 {
+    font-size: 1.05rem;
+    margin: 0.55rem 0 0.4rem;
+
+    a {
+      color: $admitik-ink;
+    }
+  }
+
+  p {
+    font-size: 0.925rem;
+    color: rgba($admitik-ink, 0.75);
+    margin-bottom: 0.9rem;
+  }
+}
+
+.uc-chip {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  background: $admitik-mist;
+  color: $admitik-blue;
+}
+
+.uc-chip--validation {
+  background: rgba(3, 45, 135, 0.1);
+  color: $admitik-navy;
+}
+
+.uc-chip--mutation {
+  background: rgba(39, 69, 138, 0.12);
+  color: $admitik-blue;
+}
+
+.uc-chip--generation {
+  background: rgba(177, 196, 233, 0.45);
+  color: darken($admitik-blue, 5%);
+}
+
+.uc-chip--solution {
+  background: #fff;
+  border: 1px solid rgba($admitik-navy, 0.35);
+  color: $admitik-navy;
+}
+
+.uc-chip--link {
+  text-decoration: none;
+  font-weight: 500;
+  text-transform: none;
+
+  &:hover {
+    background: $admitik-navy;
+    color: #fff;
+  }
+}
+
+// The labels of a use case, classified by the dimension they belong to.
+
+.uc-labels {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin: 0 0 2.25rem;
+  padding: 1.15rem 1.35rem;
+  background: $admitik-mist;
+  border-radius: 0.85rem;
+}
+
+.uc-labels__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+// Chips go white on the panel: the panel is already the tint.
+.uc-labels .uc-chip {
+  background: #fff;
+  color: $admitik-navy;
+  border: 1px solid rgba($admitik-navy, 0.08);
+  font-weight: 500;
+  text-transform: none;
+
+  &:hover {
+    background: $admitik-navy;
+    border-color: $admitik-navy;
+    color: #fff;
+  }
+}
+
+.uc-labels__legend {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: rgba($admitik-ink, 0.45);
+  min-width: 6rem;
+}
+
+// -- Use case pages -------------------------------------------------------
+
+.uc-page {
+  padding-top: 5rem;
+  padding-bottom: 4rem;
+}
+
+.uc-back {
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+
+  a {
+    color: $admitik-blue;
+    font-weight: 500;
+  }
+}
+
+// -- Footer ---------------------------------------------------------------
+
+.td-footer {
+  background-color: $admitik-ink;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.td-footer a {
+  color: $admitik-sky;
+}
+
+.td-footer__section {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+// -- Hero buttons ---------------------------------------------------------
+// Bootstrap's light buttons inherit the link colour, which vanishes on the navy cover.
+
+.td-cover-block .btn-light {
+  background-color: #fff;
+  border-color: #fff;
+  color: $admitik-navy;
+  font-weight: 600;
+
+  &:hover,
+  &:focus {
+    background-color: $admitik-sky;
+    border-color: $admitik-sky;
+    color: $admitik-ink;
+  }
+}
+
+.td-cover-block .btn-outline-light {
+  border-color: rgba(255, 255, 255, 0.65);
+  color: #fff;
+  font-weight: 600;
+
+  &:hover,
+  &:focus {
+    background-color: rgba(255, 255, 255, 0.14);
+    border-color: #fff;
+    color: #fff;
+  }
+}
+
+// -- Feature blocks -------------------------------------------------------
+
+.td-box .h1 i,
+.td-box .h1 .fa-solid {
+  color: $admitik-navy;
+  font-size: 2.25rem;
+}
+
+.td-box .h3 a {
+  color: inherit;
+  border-bottom: 2px solid rgba($admitik-navy, 0.25);
+
+  &:hover {
+    border-bottom-color: $admitik-navy;
+    text-decoration: none;
+  }
+}
+
+// -- Use case pages -------------------------------------------------------
+
+.uc-page {
+  padding-top: 5rem;
+  padding-bottom: 4rem;
+}
+
+.uc-back {
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+
+  a {
+    color: $admitik-blue;
+    font-weight: 500;
+  }
+}
+
+// -- Landing: capabilities and engines ------------------------------------
+
+.split {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3rem;
+  }
+
+  h3 {
+    font-size: 1.05rem;
+    margin-bottom: 0.5rem;
+  }
+}
+
+.cap-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: start;
+  gap: 1rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.cap-card {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid rgba($admitik-navy, 0.12);
+  border-radius: 0.75rem;
+  padding: 1.35rem 1.4rem;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+
+  h3 {
+    font-size: 1.1rem;
+    margin: 0.75rem 0 0.5rem;
+    color: $admitik-ink;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  p {
+    font-size: 0.925rem;
+    color: rgba($admitik-ink, 0.72);
+    margin: 0;
+  }
+}
+
+a.cap-card:hover {
+  border-color: rgba($admitik-navy, 0.35);
+  box-shadow: 0 8px 24px rgba($admitik-ink, 0.08);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+
+.cap-card__icon {
+  color: $admitik-navy;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.cap-card--soon {
+  background: transparent;
+  border-style: dashed;
+  border-color: rgba($admitik-navy, 0.2);
+
+  .cap-card__icon {
+    color: rgba($admitik-navy, 0.45);
+  }
+  h3 {
+    color: rgba($admitik-ink, 0.72);
+  }
+}
+
+.cap-chip {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  padding: 0.15rem 0.5rem;
+  background: $admitik-sky;
+  color: $admitik-navy;
+}
+
+.eng-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem 2rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.eng-item {
+  border-left: 3px solid rgba($admitik-navy, 0.15);
+  padding-left: 1rem;
+
+  h3 {
+    font-family: $font-family-monospace;
+    font-size: 1rem;
+    margin: 0 0 0.4rem;
+    color: $admitik-navy;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  p {
+    font-size: 0.925rem;
+    color: rgba($admitik-ink, 0.72);
+    margin-bottom: 0.6rem;
+  }
+
+  code {
+    display: inline-block;
+    white-space: nowrap;
+    background: $admitik-mist;
+    color: $admitik-navy;
+    border-radius: 0.3rem;
+    padding: 0.2rem 0.45rem;
+    font-size: 0.8rem;
+  }
+}
+
+.eng-tag {
+  font-family: $font-family-sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba($admitik-ink, 0.5);
+}
+
+// -- Alerts ---------------------------------------------------------------
+// Docsy marks them with a bar on the left. A full border reads the same and
+// does not look like a callout.
+
+.td-content .alert {
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 0.6rem;
+}
+
+.td-content .alert .alert-heading {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+// -- Tables ---------------------------------------------------------------
+// Docsy keeps tables at 80% of the reading width. Reference tables need it all,
+// otherwise the last column is scrolled out of sight.
+
+.td-content > table,
+.td-content > .td-table {
+  max-width: 100%;
+}
+
+// -- Code -----------------------------------------------------------------
+// Bootstrap paints inline code pink and headings using code inherit it.
+
+.td-content :not(pre) > code,
+.td-content p > code,
+.td-content li > code,
+.td-content td > code {
+  background-color: $admitik-mist;
+  border-radius: 0.25rem;
+  padding: 0.1rem 0.3rem;
+  color: $admitik-navy;
+}
+
+.td-content h1 code,
+.td-content h2 code,
+.td-content h3 code,
+.td-content h4 code {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: 0.9em;
+}
+
+// -- Table of contents on long use cases ----------------------------------
+
+.uc-toc {
+  margin: 0 0 2rem;
+  font-size: 0.9rem;
+
+  ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+  }
+
+  ul ul {
+    padding-left: 1rem;
+  }
+
+  li {
+    margin: 0.2rem 0;
+  }
+}
+
+.uc-toc__legend {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: rgba($admitik-ink, 0.45);
+  margin-bottom: 0.4rem;
+}

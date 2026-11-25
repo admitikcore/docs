@@ -1,0 +1,17 @@
+{{ define "main" -}}
+<div class="container uc-page">
+  <div class="td-content">
+    <p class="uc-back"><a href="{{ "/use-cases/" | relURL }}">&larr; All use cases</a></p>
+    <h1>{{ .Title }}</h1>
+    {{ with .Params.description }}<p class="lead">{{ . }}</p>{{ end }}
+    {{ partial "use-case-meta.html" . }}
+    {{ if .TableOfContents }}
+      <nav class="uc-toc">
+        <span class="uc-toc__legend">On this page</span>
+        {{ .TableOfContents }}
+      </nav>
+    {{ end }}
+    {{ .Content }}
+  </div>
+</div>
+{{ end -}}
