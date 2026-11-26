@@ -1,0 +1,255 @@
+<!--
+  Admitik announcement card. 1280x640.
+
+  Slots, in order: the three facts at the bottom of <body>. Everything else is
+  the frame and stays as it is:
+
+    .fact--memory  the chart (SVG) plus label and value
+    .fact--docs    the browser window plus label and value
+    .fact--home    the repository card plus label and value
+
+  The chart is one bezier path: a smooth curve through the points of
+  `line` in the SVG, plus the filled path that closes it to the bottom. The
+  colour change sits in the middle of the fall, where the two clip paths split.
+  Rules and palette: README.md in this folder.
+-->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Admitik announcement</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1280px; height: 640px; overflow: hidden; }
+
+  body {
+    position: relative;
+    font-family: "Poppins", system-ui, sans-serif;
+    color: #fff;
+    background: #0d2bb5 url("../content/en/background.png") center / cover no-repeat;
+  }
+
+  .shade {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(8, 26, 110, 0.08) 0%, rgba(8, 26, 110, 0.26) 50%, rgba(6, 20, 88, 0.44) 100%);
+  }
+
+  .lockup { position: absolute; top: 46px; left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: 15px; }
+  .lockup img { width: 50px; height: 65px; object-fit: contain; filter: drop-shadow(0 6px 16px rgba(3, 16, 74, 0.4)); }
+  .lockup span { font-weight: 700; font-size: 44px; letter-spacing: -1.6px; line-height: 1; }
+
+  /* -- three illustrated facts ------------------------------------------- */
+
+  .facts { position: absolute; left: 76px; right: 76px; top: 186px; bottom: 118px; display: flex; align-items: stretch; }
+  .fact { display: flex; flex-direction: column; }
+  .fact + .fact { border-left: 1px solid rgba(255, 255, 255, 0.22); }
+
+  .fact--memory { flex: 0 0 402px; padding-right: 46px; }
+  .fact--docs   { flex: 0 0 340px; padding: 0 46px; }
+  .fact--home   { flex: 1; padding-left: 46px; }
+
+  .art { height: 214px; display: flex; flex-direction: column; justify-content: center; }
+
+  .words { margin-top: auto; }
+  .words__label {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 12px; font-weight: 500; letter-spacing: 2.2px; text-transform: uppercase;
+    color: #b1c4e9;
+  }
+  .words__value {
+    margin-top: 9px;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 31px; font-weight: 600; letter-spacing: -1.2px; line-height: 1.1;
+    white-space: nowrap;
+  }
+  .fact--home .words__value { font-size: 21px; letter-spacing: -0.6px; }
+
+  /* -- memory chart ------------------------------------------------------ */
+
+  .chart { width: 352px; height: 214px; display: block; overflow: visible; }
+  .chart text {
+    font-family: "Poppins", sans-serif;
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    fill: #cfdcf7;
+  }
+
+  /* -- docs mockup ------------------------------------------------------- */
+
+  .window {
+    width: 246px; height: 150px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.13);
+    box-shadow: 0 14px 34px rgba(3, 16, 74, 0.22);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .window__bar { display: flex; align-items: center; gap: 5px; padding: 9px 10px; }
+  .window__dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.5); flex: none; }
+  .window__url {
+    margin-left: 6px; flex: 1;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.18);
+    font-size: 10.5px; font-weight: 500; letter-spacing: 0.1px;
+    color: rgba(255, 255, 255, 0.92);
+    text-align: center;
+  }
+  .window__body { flex: 1; display: flex; gap: 10px; padding: 10px; }
+  .window__side { width: 52px; flex: none; display: flex; flex-direction: column; gap: 6px; }
+  .window__nav { height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.22); }
+  .window__nav--on { background: rgba(255, 255, 255, 0.55); }
+  .window__main { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+  .window__title { height: 9px; width: 66%; border-radius: 4px; background: rgba(255, 255, 255, 0.5); }
+  .window__grid { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: stretch; }
+  .card {
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.14);
+    padding: 8px;
+    display: flex; flex-direction: column; justify-content: center; gap: 6px;
+  }
+  .card__line { height: 4px; border-radius: 2px; background: rgba(255, 255, 255, 0.45); }
+  .card__line--short { width: 60%; background: rgba(255, 255, 255, 0.3); }
+  .card--accent { background: rgba(177, 196, 233, 0.26); }
+  .card--accent .card__line { background: #dbe6fb; }
+
+  /* -- repo card --------------------------------------------------------- */
+
+  .repo {
+    width: 246px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.13);
+    box-shadow: 0 14px 34px rgba(3, 16, 74, 0.22);
+    padding: 16px 18px;
+  }
+  .repo__top { display: flex; align-items: center; gap: 12px; }
+  .repo__avatar {
+    width: 38px; height: 38px; flex: none;
+    border-radius: 9px;
+    background: rgba(4, 26, 90, 0.55);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .repo__avatar img { width: 20px; height: 26px; object-fit: contain; }
+  .repo__name { font-size: 15.5px; font-weight: 600; letter-spacing: -0.3px; line-height: 1.2; white-space: nowrap; }
+  .repo__name span { color: #b1c4e9; font-weight: 500; }
+  .repo__meta { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
+  .repo__pill {
+    padding: 3px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 999px;
+    font-size: 10.5px; font-weight: 500;
+  }
+  .repo__branch {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 10.5px; font-weight: 500; color: rgba(255, 255, 255, 0.8);
+  }
+  .repo__branch svg { width: 12px; height: 12px; }
+</style>
+
+<div class="shade"></div>
+
+<div class="lockup">
+  <img src="../static/images/logo.png" alt="">
+  <span>Admitik</span>
+</div>
+
+<div class="facts">
+  <section class="fact fact--memory">
+    <div class="art">
+      <svg class="chart" viewBox="0 0 360 214" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="fadeOld" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.30" />
+            <stop offset="100%" stop-color="#ffffff" stop-opacity="0.02" />
+          </linearGradient>
+          <linearGradient id="fadeNew" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#b1c4e9" stop-opacity="0.45" />
+            <stop offset="100%" stop-color="#b1c4e9" stop-opacity="0.05" />
+          </linearGradient>
+          <clipPath id="cutOld"><rect x="0" y="0" width="207" height="214" /></clipPath>
+          <clipPath id="cutNew"><rect x="207" y="0" width="153" height="214" /></clipPath>
+        </defs>
+
+        <path d="M0,112 C2.7,111.4 13.2,120.3 18.0,108.0 C22.8,95.7 26.9,30.6 32.0,30.0 C37.1,29.4 46.0,94.1 52.0,104.0 C58.0,113.9 67.2,107.7 72.0,96.0 C76.8,84.3 79.8,25.4 84.0,26.0 C88.2,26.6 94.9,89.5 100.0,100.0 C105.1,110.5 112.0,96.5 118.0,96.0 C124.0,95.5 132.9,97.2 140.0,97.0 C147.1,96.8 158.2,95.6 165.0,95.0 C171.8,94.4 179.8,93.5 185.0,93.0 C190.2,92.5 197.2,89.2 200.0,92.0 C202.8,94.8 202.8,103.0 204.0,112.0 C205.2,121.0 206.5,141.8 208.0,152.0 C209.5,162.2 212.1,174.9 214.0,180.0 C215.9,185.1 218.2,185.7 221.0,186.0 C223.8,186.3 229.1,183.3 233.0,182.0 C236.9,180.7 242.5,178.1 247.0,177.0 C251.5,175.9 257.9,174.2 263.0,175.0 C268.1,175.8 275.6,180.8 281.0,182.0 C286.4,183.2 293.9,183.6 299.0,183.0 C304.1,182.4 310.2,178.8 315.0,178.0 C319.8,177.2 326.5,177.7 331.0,178.0 C335.5,178.3 341.2,179.8 345.0,180.0 C348.8,180.2 354.4,179.2 356.0,179.0 L356,214 L0,214 Z" fill="url(#fadeOld)" clip-path="url(#cutOld)" />
+        <path d="M0,112 C2.7,111.4 13.2,120.3 18.0,108.0 C22.8,95.7 26.9,30.6 32.0,30.0 C37.1,29.4 46.0,94.1 52.0,104.0 C58.0,113.9 67.2,107.7 72.0,96.0 C76.8,84.3 79.8,25.4 84.0,26.0 C88.2,26.6 94.9,89.5 100.0,100.0 C105.1,110.5 112.0,96.5 118.0,96.0 C124.0,95.5 132.9,97.2 140.0,97.0 C147.1,96.8 158.2,95.6 165.0,95.0 C171.8,94.4 179.8,93.5 185.0,93.0 C190.2,92.5 197.2,89.2 200.0,92.0 C202.8,94.8 202.8,103.0 204.0,112.0 C205.2,121.0 206.5,141.8 208.0,152.0 C209.5,162.2 212.1,174.9 214.0,180.0 C215.9,185.1 218.2,185.7 221.0,186.0 C223.8,186.3 229.1,183.3 233.0,182.0 C236.9,180.7 242.5,178.1 247.0,177.0 C251.5,175.9 257.9,174.2 263.0,175.0 C268.1,175.8 275.6,180.8 281.0,182.0 C286.4,183.2 293.9,183.6 299.0,183.0 C304.1,182.4 310.2,178.8 315.0,178.0 C319.8,177.2 326.5,177.7 331.0,178.0 C335.5,178.3 341.2,179.8 345.0,180.0 C348.8,180.2 354.4,179.2 356.0,179.0 L356,214 L0,214 Z" fill="url(#fadeNew)" clip-path="url(#cutNew)" />
+
+        <path d="M0,112 C2.7,111.4 13.2,120.3 18.0,108.0 C22.8,95.7 26.9,30.6 32.0,30.0 C37.1,29.4 46.0,94.1 52.0,104.0 C58.0,113.9 67.2,107.7 72.0,96.0 C76.8,84.3 79.8,25.4 84.0,26.0 C88.2,26.6 94.9,89.5 100.0,100.0 C105.1,110.5 112.0,96.5 118.0,96.0 C124.0,95.5 132.9,97.2 140.0,97.0 C147.1,96.8 158.2,95.6 165.0,95.0 C171.8,94.4 179.8,93.5 185.0,93.0 C190.2,92.5 197.2,89.2 200.0,92.0 C202.8,94.8 202.8,103.0 204.0,112.0 C205.2,121.0 206.5,141.8 208.0,152.0 C209.5,162.2 212.1,174.9 214.0,180.0 C215.9,185.1 218.2,185.7 221.0,186.0 C223.8,186.3 229.1,183.3 233.0,182.0 C236.9,180.7 242.5,178.1 247.0,177.0 C251.5,175.9 257.9,174.2 263.0,175.0 C268.1,175.8 275.6,180.8 281.0,182.0 C286.4,183.2 293.9,183.6 299.0,183.0 C304.1,182.4 310.2,178.8 315.0,178.0 C319.8,177.2 326.5,177.7 331.0,178.0 C335.5,178.3 341.2,179.8 345.0,180.0 C348.8,180.2 354.4,179.2 356.0,179.0" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#cutOld)" />
+        <path d="M0,112 C2.7,111.4 13.2,120.3 18.0,108.0 C22.8,95.7 26.9,30.6 32.0,30.0 C37.1,29.4 46.0,94.1 52.0,104.0 C58.0,113.9 67.2,107.7 72.0,96.0 C76.8,84.3 79.8,25.4 84.0,26.0 C88.2,26.6 94.9,89.5 100.0,100.0 C105.1,110.5 112.0,96.5 118.0,96.0 C124.0,95.5 132.9,97.2 140.0,97.0 C147.1,96.8 158.2,95.6 165.0,95.0 C171.8,94.4 179.8,93.5 185.0,93.0 C190.2,92.5 197.2,89.2 200.0,92.0 C202.8,94.8 202.8,103.0 204.0,112.0 C205.2,121.0 206.5,141.8 208.0,152.0 C209.5,162.2 212.1,174.9 214.0,180.0 C215.9,185.1 218.2,185.7 221.0,186.0 C223.8,186.3 229.1,183.3 233.0,182.0 C236.9,180.7 242.5,178.1 247.0,177.0 C251.5,175.9 257.9,174.2 263.0,175.0 C268.1,175.8 275.6,180.8 281.0,182.0 C286.4,183.2 293.9,183.6 299.0,183.0 C304.1,182.4 310.2,178.8 315.0,178.0 C319.8,177.2 326.5,177.7 331.0,178.0 C335.5,178.3 341.2,179.8 345.0,180.0 C348.8,180.2 354.4,179.2 356.0,179.0" fill="none" stroke="#b1c4e9" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#cutNew)" />
+
+        <text x="88" y="16">6 GB</text>
+        <text x="356" y="166" text-anchor="end">200 MB</text>
+      </svg>
+    </div>
+    <div class="words">
+      <div class="words__label">Memory</div>
+      <div class="words__value">30&times; less</div>
+    </div>
+  </section>
+
+  <section class="fact fact--docs">
+    <div class="art">
+      <div class="window">
+        <div class="window__bar">
+          <div class="window__dot"></div>
+          <div class="window__dot"></div>
+          <div class="window__dot"></div>
+          <div class="window__url">admitik.dev</div>
+        </div>
+        <div class="window__body">
+          <div class="window__side">
+            <div class="window__nav window__nav--on"></div>
+            <div class="window__nav"></div>
+            <div class="window__nav"></div>
+          </div>
+          <div class="window__main">
+            <div class="window__title"></div>
+            <div class="window__grid">
+              <div class="card">
+                <div class="card__line"></div>
+                <div class="card__line card__line--short"></div>
+              </div>
+              <div class="card card--accent">
+                <div class="card__line"></div>
+                <div class="card__line card__line--short"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="words">
+      <div class="words__label">Docs &amp; use cases</div>
+      <div class="words__value">admitik.dev</div>
+    </div>
+  </section>
+
+  <section class="fact fact--home">
+    <div class="art">
+      <div class="repo">
+        <div class="repo__top">
+          <div class="repo__avatar"><img src="../static/images/logo.png" alt=""></div>
+          <div class="repo__name">admitikcore<span style="color:#b1c4e9;font-weight:500">/admitik</span></div>
+        </div>
+        <div class="repo__meta">
+          <div class="repo__branch">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="6" cy="5" r="2.4" />
+              <circle cx="6" cy="19" r="2.4" />
+              <circle cx="18" cy="8" r="2.4" />
+              <path d="M6 7.4v9.2" />
+              <path d="M18 10.4c0 3.2-3.6 3.4-6 3.6" />
+            </svg>
+            main
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="words">
+      <div class="words__label">New home</div>
+      <div class="words__value">github.com/admitikcore</div>
+    </div>
+  </section>
+</div>
+</html>
