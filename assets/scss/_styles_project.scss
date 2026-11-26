@@ -23,9 +23,14 @@
   font-weight: 500;
 }
 
-// The landing page shows the branding in the hero, so the bar keeps the menu only.
+// The landing page shows the branding in the hero, so the bar keeps the menu only, until the hero
+// leaves the viewport.
 .td-home .td-navbar .navbar-brand {
   display: none;
+}
+
+.td-home .td-navbar-brand-revealed .navbar-brand {
+  display: flex;
 }
 
 // -- Landing page ---------------------------------------------------------
