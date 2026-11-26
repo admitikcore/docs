@@ -1,0 +1,7 @@
+{{/* Scripts of the site, on top of the theme bundle. */}}
+{{ if .IsHome }}
+  {{ with resources.Get "js/navbar-brand.js" }}
+    {{ $js := . | minify | fingerprint }}
+    <script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" crossorigin="anonymous"></script>
+  {{ end }}
+{{ end }}
